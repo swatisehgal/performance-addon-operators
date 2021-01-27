@@ -19,6 +19,7 @@ require (
 	github.com/go-openapi/validate v0.19.8 // indirect
 	github.com/googleapis/gnostic v0.4.0 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
+	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/onsi/ginkgo v1.12.1
 	github.com/onsi/gomega v1.10.1
@@ -31,6 +32,8 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.6.0 // indirect
 	github.com/prometheus/common v0.10.0 // indirect
+	github.com/spf13/cobra v1.1.1
+	github.com/spf13/viper v1.7.0
 	github.com/vincent-petithory/dataurl v0.0.0-20191104211930-d1553a71de50 // indirect
 	go.mongodb.org/mongo-driver v1.3.2 // indirect
 	go.uber.org/zap v1.14.1 // indirect

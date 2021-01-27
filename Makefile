@@ -19,13 +19,15 @@ OPERATOR_IMAGE_NAME="performance-addon-operator"
 BUNDLE_IMAGE_NAME="performance-addon-operator-bundle"
 INDEX_IMAGE_NAME="performance-addon-operator-index"
 MUSTGATHER_IMAGE_NAME="performance-addon-operator-must-gather"
-LATENCY_TEST_IMAGE_NAME="latency-test"
+LATENCY_TEST_IMAGE_NAME="latency-test
+PERF_PROFILE_CREATOR_IMAGE_NAME="performance-addon-operator-perf-profile-creator"
 
 FULL_OPERATOR_IMAGE ?= "$(IMAGE_REGISTRY)/$(REGISTRY_NAMESPACE)/$(OPERATOR_IMAGE_NAME):$(IMAGE_TAG)"
 FULL_BUNDLE_IMAGE ?= "${IMAGE_REGISTRY}/${REGISTRY_NAMESPACE}/${BUNDLE_IMAGE_NAME}:${IMAGE_TAG}"
 FULL_INDEX_IMAGE ?= "${IMAGE_REGISTRY}/${REGISTRY_NAMESPACE}/${INDEX_IMAGE_NAME}:${IMAGE_TAG}"
 FULL_MUSTGATHER_IMAGE ?= "${IMAGE_REGISTRY}/${REGISTRY_NAMESPACE}/${MUSTGATHER_IMAGE_NAME}:${IMAGE_TAG}"
 FULL_LATENCY_TEST_IMAGE ?= "${IMAGE_REGISTRY}/${REGISTRY_NAMESPACE}/${LATENCY_TEST_IMAGE_NAME}:${IMAGE_TAG}"
+FULL_PERF_PROFILE_CREATOR_IMAGE ?= "${IMAGE_REGISTRY}/${REGISTRY_NAMESPACE}/${PERF_PROFILE_CREATOR_IMAGE_NAME}:${IMAGE_TAG}"
 
 CLUSTER ?= "ci"
 
@@ -117,6 +119,12 @@ must-gather-container:
 	@echo "Building the performance-addon-operator must-gather image"
 	$(IMAGE_BUILD_CMD) build --no-cache -f openshift-ci/Dockerfile.must-gather -t "$(FULL_MUSTGATHER_IMAGE)"  .
 
+
+.PHONY: perf-profile-creator-container
+perf-profile-creator-container:
+	@echo "Building the performance-addon-operator performance profile creator image"
+	$(IMAGE_BUILD_CMD) build --no-cache -f openshift-ci/Dockerfile.perf-profile-creator -t "$(FULL_PERF_PROFILE_CREATOR_IMAGE)" --build-arg BIN_DIR="_output/bin/" build/
+
 .PHONY: latency-test-container
 latency-test-container:
 	@echo "Building the latency test image"
@@ -143,6 +151,16 @@ operator-sdk:
 	else\
 		echo "Using operator-sdk cached at $(OPERATOR_SDK)";\
 	fi
+
+
+.PHONY: create-performance-profile
+create-performance-profile:  build-output-dir
+	@echo "Creating performance profile"
+	mkdir -p $(TOOLS_BIN_DIR); \
+    LDFLAGS="-s -w "; \
+    LDFLAGS+="-X github.com/openshift-kni/performance-addon-operators/cmd/performance-profile-creator "; \
+	env GOOS=$(TARGET_GOOS) GOARCH=$(TARGET_GOARCH) go build  -v -i $(LDFLAGS) -o $(TOOLS_BIN_DIR)/performance-profile-creator ./cmd/performance-profile-creator
+
 
 .PHONY: generate-csv
 generate-csv: operator-sdk kustomize dist-csv-processor
