@@ -56,8 +56,29 @@ type profileCreatorArgs struct {
 	userLevelNetworking  bool
 }
 
+func customHelp(cmd *cobra.Command, args []string) {
+
+	helpMessage := ` A tool that automates creation of Performance Profiles
+
+Usage:
+  performance-profile-creator [flags]
+
+Flags:
+  -H, --disable-ht                      Disable Hyperthreading
+  -M, --must-gather-dir-path string     Must gather directory path (default "must-gather")
+  -P, --power-consumption-mode string   The power consumption mode (default "cstate")
+  -N, --profile-name string             Name of the performance profile to be created (default "performance")
+  -R, --reserved-cpu-count int          Number of reserved CPUs
+  -K, --rt-kernel                       Enable Real Time Kernel (default true)
+  -S, --split-cpus-across-numa          Split the CPUs across NUMA nodes (default true)
+  -U, --user-level-networking           Run with User level Networking(DPDK) enabled
+	`
+	fmt.Fprintf(os.Stderr, "%v", helpMessage)
+}
+
 func init() {
 	args := &profileCreatorArgs{}
+	rootCmd.SetHelpFunc(customHelp)
 	rootCmd.PersistentFlags().IntVarP(&args.reservedCPUCount, "reserved-cpu-count", "R", 0, "Number of reserved CPUs")
 	rootCmd.PersistentFlags().BoolVarP(&args.splitCPUsAcrossNUMA, "split-cpus-across-numa", "S", true, "Split the CPUs across NUMA nodes")
 	rootCmd.PersistentFlags().BoolVarP(&args.disableHT, "disable-ht", "H", false, "Disable Hyperthreading")
@@ -71,7 +92,6 @@ func init() {
 	// 1) Make flags required/optional
 	// 2) e.g.check to make sure that power consumption string is in {CSTATE NO_CSTATE IDLE_POLL}
 
-	// Creating Performance Profile
 	createProfile(args.profileName)
 }
 
